@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loader</title>
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    color: #000;
+}
+pre {
+    margin: 0;
+    padding: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font: 13px monospace;
+}
+</style>
+</head>
+<body>
+<pre id="code"></pre>
+<script>
+document.getElementById("code").textContent = `local HttpService = game:GetService("HttpService")
+
+local keyResponse = request({
+    Url = "https://keynamesojik.netlify.app/",
+    Method = "GET",
+    Headers = {
+        ["Accept"] = "text/plain"
+    }
+})
+
+if not (tonumber(keyResponse.StatusCode or keyResponse.Status or 0) >= 200 and tonumber(keyResponse.StatusCode or keyResponse.Status or 0) < 300) then
+    error("키 요청 실패: " .. tostring(keyResponse.StatusCode))
+end
+
+local key = tostring(keyResponse.Body):gsub("%s+", "")
+
+local tokenResponse = request({
+    Url = "https://script-vault-yr.carvedcocoa512.chatgpt.site/api/request",
+    Method = "POST",
+    Headers = {
+        ["Content-Type"] = "application/json",
+        ["Accept"] = "application/json"
+    },
+    Body = HttpService:JSONEncode({
+        isScript = true,
+        siteId = "73d17995c8184b",
+        key = key
+    })
+})
+
+if not (tonumber(tokenResponse.StatusCode or tokenResponse.Status or 0) >= 200 and tonumber(tokenResponse.StatusCode or tokenResponse.Status or 0) < 300) then
+    error("token error: " .. tostring(tokenResponse.StatusCode) .. "\\n" .. tostring(tokenResponse.Body))
+end
+
+local token = HttpService:JSONDecode(tokenResponse.Body).token
+
+local scriptResponse = request({
+    Url = "https://script-vault-yr.carvedcocoa512.chatgpt.site/api/script?IsScript=true&token=" .. HttpService:UrlEncode(token),
+    Method = "GET"
+})
+
+if not (tonumber(scriptResponse.StatusCode or scriptResponse.Status or 0) >= 200 and tonumber(scriptResponse.StatusCode or scriptResponse.Status or 0) < 300) then
+    error("error: " .. tostring(scriptResponse.StatusCode) .. "\\n" .. tostring(scriptResponse.Body))
+end
+
+loadstring(scriptResponse.Body)()`;
+</script>
+</body>
+</html>
