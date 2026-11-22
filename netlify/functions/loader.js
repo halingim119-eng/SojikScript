@@ -1,5 +1,39 @@
 
 const loader = `local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
+local StarterGui = game:GetService("StarterGui")
+local GuiService = game:GetService("GuiService")
+
+local device = "알 수 없는 기기"
+
+if GuiService:IsTenFootInterface() then
+    device = "콘솔"
+elseif UserInputService.TouchEnabled then
+    device = "모바일"
+    if workspace.CurrentCamera and workspace.CurrentCamera.ViewportSize.X >= 1000 then
+        device = "태블릿"
+    end
+elseif UserInputService.KeyboardEnabled then
+    device = "컴퓨터"
+end
+
+task.spawn(function()
+    for i = 1, 10 do
+        local success = pcall(function()
+            StarterGui:SetCore("SendNotification", {
+                Title = "| 소직별 스크립트",
+                Text = "[" .. device .. "]에서 실행중.",
+                Duration = 5
+            })
+        end)
+
+        if success then
+            break
+        end
+
+        task.wait(0.5)
+    end
+end)
 
 local keyResponse = request({
     Url = "https://keynamesojik.netlify.app/",
