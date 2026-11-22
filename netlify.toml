@@ -1,0 +1,10 @@
+
+[build]
+  functions = "netlify/functions"
+  publish = "."
+
+[[redirects]]
+  from = "/"
+  to = "/.netlify/functions/loader"
+  status = 200
+  force = true
